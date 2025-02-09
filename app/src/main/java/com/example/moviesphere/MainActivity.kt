@@ -10,5 +10,7 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
         Log.i("MyTag", "Testing")
+        Log.i("MyTag", "Testing Dev Branch")
+
     }
 }
