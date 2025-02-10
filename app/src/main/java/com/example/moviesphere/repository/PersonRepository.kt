@@ -1,6 +1,7 @@
 package com.example.moviesphere.repository
 
 import com.example.moviesphere.beans.response.Person
+import com.example.moviesphere.beans.response.PersonDetails
 import com.example.moviesphere.network.RetrofitClient
 
 class PersonRepository {
@@ -17,5 +18,11 @@ class PersonRepository {
         } else {
             emptyList()
         }
+    }
+
+    suspend fun getPersonDetails(personId: Int): PersonDetails {
+        val details = apiService.getPersonDetails(personId)
+        val images = apiService.getPersonImages(personId).profiles.map { it.file_path }
+        return details.copy(images = images)
     }
 }

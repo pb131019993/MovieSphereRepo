@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.moviesphere.beans.response.Person
+import com.example.moviesphere.beans.response.PersonDetails
 import com.example.moviesphere.repository.PersonRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -21,6 +22,9 @@ class PersonViewModel : ViewModel() {
 
     private val peopleList = mutableListOf<Person>()
     private val searchList = mutableListOf<Person>()
+
+    private val _personDetails = MutableLiveData<PersonDetails>()
+    val personDetails: LiveData<PersonDetails> get() = _personDetails
 
     fun loadPopularPeople(page: Int) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -40,6 +44,13 @@ class PersonViewModel : ViewModel() {
             withContext(Dispatchers.Main) {
                 _searchResults.value = searchList
             }
+        }
+    }
+
+    fun loadPersonDetails(personId: Int) {
+        viewModelScope.launch {
+            val details = repository.getPersonDetails(personId)
+            _personDetails.value = details
         }
     }
 }

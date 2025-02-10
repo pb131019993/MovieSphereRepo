@@ -1,5 +1,6 @@
 package com.example.moviesphere.view
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -13,9 +14,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.moviesphere.R
 import com.example.moviesphere.adapters.PersonAdapter
+import com.example.moviesphere.databinding.ActivityMainBinding
 import com.example.moviesphere.viewmodel.PersonViewModel
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityMainBinding
     private val viewModel: PersonViewModel by viewModels()
     private lateinit var adapter: PersonAdapter
     private var isLoading = false
@@ -27,15 +30,18 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
-        val searchBar = findViewById<EditText>(R.id.search_bar)
-        val searchIcon = findViewById<ImageView>(R.id.search_icon)
-        val progressBar = findViewById<ProgressBar>(R.id.progressBar)
-
-        adapter = PersonAdapter()
-        recyclerView.apply {
+        adapter = PersonAdapter { person ->
+            val intent = Intent(this, PersonDetailsActivity::class.java).apply {
+                putExtra("person_id", person.id)
+                putExtra("person_name", person.name)
+                putExtra("profile_path", person.profile_path)
+            }
+            startActivity(intent)
+        }
+        binding.recyclerView.apply {
             layoutManager = LinearLayoutManager(this@MainActivity)
             this.adapter = this@MainActivity.adapter
             addOnScrollListener(object : RecyclerView.OnScrollListener() {
@@ -67,10 +73,10 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        searchBar.addTextChangedListener(object : TextWatcher {
+        binding.searchBar.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 val query = s.toString()
-                searchIcon.visibility = if (query.isEmpty()) ImageView.VISIBLE else ImageView.GONE
+                binding.searchIcon.visibility = if (query.isEmpty()) ImageView.VISIBLE else ImageView.GONE
 
                 if (query.isNotEmpty()) {
                     isSearching = true
