@@ -9,4 +9,13 @@ class PersonRepository {
     suspend fun getPopularPeople(page: Int): List<Person> {
         return apiService.getPopularPeople(page).results
     }
+
+    suspend fun searchPeople(query: String, page: Int): List<Person> {
+        val response = apiService.searchPeople(query, page)
+        return if (response.isSuccessful) {
+            response.body()?.results ?: emptyList()
+        } else {
+            emptyList()
+        }
+    }
 }

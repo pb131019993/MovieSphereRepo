@@ -16,7 +16,11 @@ class PersonViewModel : ViewModel() {
     private val _popularPeople = MutableLiveData<List<Person>>()
     val popularPeople: LiveData<List<Person>> get() = _popularPeople
 
+    private val _searchResults = MutableLiveData<List<Person>>()
+    val searchResults: LiveData<List<Person>> get() = _searchResults
+
     private val peopleList = mutableListOf<Person>()
+    private val searchList = mutableListOf<Person>()
 
     fun loadPopularPeople(page: Int) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -24,6 +28,17 @@ class PersonViewModel : ViewModel() {
             peopleList.addAll(newPeople)
             withContext(Dispatchers.Main) {
                 _popularPeople.value = peopleList
+            }
+        }
+    }
+
+    fun searchPeople(query: String, page: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val newResults = repository.searchPeople(query, page)
+            if (page == 1) searchList.clear()
+            searchList.addAll(newResults)
+            withContext(Dispatchers.Main) {
+                _searchResults.value = searchList
             }
         }
     }
